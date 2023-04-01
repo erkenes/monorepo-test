@@ -1,6 +1,7 @@
 {
     "name": "erkenes/monorepo-test-target-1",
     "description": "Monorepo test target",
+    "license": "MIT",
     "authors": [
         {
             "name": "Enes Erk",
