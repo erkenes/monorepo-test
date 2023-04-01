@@ -155,3 +155,17 @@ jobs:
           remote_repository: '${{ env.REPOSITORY_PROTOCOL }}${{ env.REPOSITORY_HOST }}/${{ matrix.package.repository }}.git' # this is the repository name of the target repository
           remote_repository_access_token: 'x-access-token:${{ steps.generate_token.outputs.token }}' # this is the access token for the target repository
 ```
+
+#### Branch protection in target repositories
+
+If you want to protect the main branch in the target repositories, you should add the following branch protection rules:
+
+
+* Branch name pattern: `main`
+* Require pull request reviews before merging: `true`
+  * Required approving reviews: `1`
+  * Dismiss stale pull request approvals when new commits are pushed: `true`
+  * Require review from Code Owners: `true`
+* Do not allow to bypassing the above settings: `false`
+* Allow force pushes `true`
+  * Specify who can force push: Add your generated GitHub App
