@@ -57,3 +57,34 @@ jobs:
           package_directory: ${{ matrix.package.local_path }}
           remote_repository: '${{ env.REPOSITORY_PROTOCOL }}${{ env.REPOSITORY_HOST }}/${{ matrix.package.repository }}.git'
           remote_repository_access_token: 'x-access-token:${{ steps.generate_token.outputs.token }}'
+
+      # Create changelog
+      - name: Create Changelog - Generate token
+        id: generate_token_changelog
+        uses: tibdex/github-app-token@586e1a624db6a5a4ac2c53daeeded60c5e3d50fe
+        with:
+          app_id: ${{ secrets.TOKEN_APP_ID }}
+          private_key: ${{ secrets.TOKEN_APP_PRIVATE_KEY }}
+      - name: Create Changelog - Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ matrix.package.repository }}
+          path: './__changelog/${{ matrix.package.repository }}'
+          ref: ${{ env.RELEASE_VERSION }}
+          token: ${{ steps.generate_token_changelog.outputs.token }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - run: npm run conventional-changelog -r 0 -p angular -i CHANGELOG.md -o ${{ matrix.package.local_path}}/CHANGELOG.md
+      -
+        name: Push Changelog - Commit and push
+        uses: EndBug/add-and-commit@v7
+        with:
+          author_name: ${{ github.actor }}
+          author_email: ${{ github.actor }}@users.noreply.github.com
+          message: 'feat: Add changelog for ${{ matrix.package.repository }}'
+          add: '${{ matrix.package.local_path}}/CHANGELOG.md'
+          new_branch: realase/${{ env.RELEASE_VERSION }}
+          token: ${{ steps.generate_token_changelog.outputs.token }}
