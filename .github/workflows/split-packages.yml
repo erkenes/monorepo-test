@@ -77,7 +77,8 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      - run: npm run conventional-changelog -r 0 -p angular -i CHANGELOG.md -o ${{ matrix.package.local_path}}/CHANGELOG.md
+      - run: npm ci
+      - run: npm run changelog -- --infile ${{ matrix.package.local_path}}/CHANGELOG.md --same-file
       -
         name: Push Changelog - Commit and push
         uses: EndBug/add-and-commit@v7
