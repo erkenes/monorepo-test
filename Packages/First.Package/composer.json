@@ -1,0 +1,15 @@
+{
+    "name": "erkenes/monorepo-test-target-1",
+    "description": "Monorepo test target",
+    "authors": [
+        {
+            "name": "Enes Erk",
+            "homepage": "https://github.com/erkenes",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/erkenes/monorepo-test/issues",
+        "source": "https://github.com/erkenes/monorepo-test-target-1"
+    }
+}
