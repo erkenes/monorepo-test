@@ -33,3 +33,58 @@ To create a custom GitHub App, you need to follow the steps below. We are using 
 11. Go to "Actions" and click "New repository secret"
 12. Create a new secret with the name "TOKEN_APP_ID" and paste the "App ID" from *9.* in the value field
 13. Create new secret with the name "TOKEN_APP_PRIVATE_KEY" and paste the private key from *5.* in the value field
+
+## Workflows
+
+### New Version (Tag and Changelog)
+
+To create a new version and a changelog with the newest changes, you need to follow the steps below.
+
+1. Create a new workflow file in the `.github/workflows` folder
+```yaml
+# Path: .github/workflows/new-version.yml
+name: Create new version
+on:
+  push:
+    branches:
+      - main
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@586e1a624db6a5a4ac2c53daeeded60c5e3d50fe
+        with:
+          app_id: ${{ secrets.TOKEN_APP_ID }}
+          private_key: ${{ secrets.TOKEN_APP_PRIVATE_KEY }}
+      - uses: google-github-actions/release-please-action@v3
+        with:
+          command: manifest
+          token: ${{ steps.generate_token.outputs.token }}
+```
+
+2. Create a `.release-please-manifest.json` at the root of the repository
+```json
+{
+  ".": "0.0.1"
+}
+```
+
+3. Create a `release-please-config.json` at the root of the repository
+```json
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "include-v-in-tag": false,
+      "draft": false,
+      "prerelease": false,
+      "bumpMinorPreMajor": false,
+      "bumpPatchForMinorPreMajor": false,
+      "changelogPath": "CHANGELOG.md",
+      "versioning": "default"
+    }
+  }
+}
+```
