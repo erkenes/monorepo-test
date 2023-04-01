@@ -37,7 +37,7 @@ jobs:
           app_id: ${{ secrets.TOKEN_APP_ID }}
           private_key: ${{ secrets.TOKEN_APP_PRIVATE_KEY }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # set current branch or tag
       - name: Set release version for branch or tag

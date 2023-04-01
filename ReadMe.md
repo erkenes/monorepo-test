@@ -88,3 +88,70 @@ jobs:
   }
 }
 ```
+
+### Split-Packages
+
+This workflow is triggered when a new tag is pushed to the repository. It will split all packages that are configured in the strategy-matrix in this workflow and pushes them into their repository with the all commits to this package and the new tag.
+
+If there is a new repository added, you should trigger this workflow manually to create the main branch.
+
+```yaml
+name: Monorepo Split
+
+on:
+  push:
+    tags: [ '*.*.*' ]
+  workflow_dispatch: # for initial setup or if a new package was added
+
+env:
+  REPOSITORY_OWNER: erkenes # this is the organization name
+  REPOSITORY_PROTOCOL: https://
+  REPOSITORY_HOST: github.com # this is the host name of the repository
+  REPOSITORY_NAME: monorepo-test # this is the repository name
+
+jobs:
+  packages_split:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # this is the list of packages that should be split
+        package:
+          -
+            local_path: 'Packages/First.Package' # this is the local path of the package
+            repository: 'erkenes/monorepo-test-target-1' # this is the repository name of the target repository
+            default_branch: 'main' # this is the default branch of the target repository
+          -
+            local_path: 'Packages/Second.Package'
+            repository: 'erkenes/monorepo-test-target-2'
+            default_branch: 'main'
+
+    steps:
+      -
+        name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@586e1a624db6a5a4ac2c53daeeded60c5e3d50fe
+        with:
+          app_id: ${{ secrets.TOKEN_APP_ID }}
+          private_key: ${{ secrets.TOKEN_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v3
+
+      # set branch or tag name as release version
+      - name: Set release version for branch or tag
+        run: echo "RELEASE_VERSION=${{ github.ref }}" >> $GITHUB_ENV
+
+      - uses: erkenes/monorepo-split-action@1.3.0 # this is the action that will split the packages
+        with:
+          access_token: 'x-access-token:${{ steps.generate_token.outputs.token }}'
+          repository_protocol: ${{ env.REPOSITORY_PROTOCOL }} # this is the protocol of the repository
+          repository_host: ${{ env.REPOSITORY_HOST }} # this is the host name of the repository
+          repository_organization: ${{ env.REPOSITORY_OWNER }} # this is the organization name
+          repository_name: ${{ env.REPOSITORY_NAME }} # this is the repository name
+          default_branch: ${{ matrix.package.default_branch }} # this is the default branch of the target repository
+          target_branch: ${{ env.RELEASE_VERSION }} # this is the branch or tag name that will be created in the target repository
+          package_directory: ${{ matrix.package.local_path }} # this is the local path of the package
+          remote_repository: '${{ env.REPOSITORY_PROTOCOL }}${{ env.REPOSITORY_HOST }}/${{ matrix.package.repository }}.git' # this is the repository name of the target repository
+          remote_repository_access_token: 'x-access-token:${{ steps.generate_token.outputs.token }}' # this is the access token for the target repository
+```
