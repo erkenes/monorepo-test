@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/erkenes/monorepo-test/compare/0.2.0...0.3.0) (2023-04-01)
+
+
+### Features
+
+* **package1:** add composer.json ([db4e825](https://github.com/erkenes/monorepo-test/commit/db4e825e8cae8fe481ca85fa3519f2c24a367418))
+* **package1:** Add License ([3e78214](https://github.com/erkenes/monorepo-test/commit/3e78214f21150676f54c9e19979aedc2ab029d4c))
+
 ## [0.2.0](https://github.com/erkenes/monorepo-test/compare/0.1.0...0.2.0) (2023-04-01)
 
 
