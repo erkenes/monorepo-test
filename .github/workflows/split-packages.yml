@@ -31,8 +31,7 @@ jobs:
             default_branch: 'main'
 
     steps:
-      -
-        name: Generate token
+      - name: Generate token
         id: generate_token
         uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92
         with:
@@ -45,7 +44,8 @@ jobs:
       - name: Set release version for branch or tag
         run: echo "RELEASE_VERSION=${{ github.ref }}" >> $GITHUB_ENV
 
-      - uses: erkenes/monorepo-split-action@1.3.0
+      - name: 'Split package: ${{ matrix.package.repository_name }}'
+        uses: erkenes/monorepo-split-action@1.3.0
         with:
           access_token: 'x-access-token:${{ steps.generate_token.outputs.token }}'
           repository_protocol: ${{ env.REPOSITORY_PROTOCOL }}
@@ -66,18 +66,21 @@ jobs:
           path: './temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}'
           ref: ${{ env.RELEASE_VERSION }}
           token: ${{ steps.generate_token.outputs.token }}
-      -
-        name: Create Changelog - Init Node (npm)
+
+      - name: Create Changelog - Init Node (npm)
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'npm'
-      -
-        name: Create Changelog - Install NPM dependencies
-        run: npm ci
-      -
-        name: Create Changelog - Generate changelog
-        run: npm run changelog -- --infile ./temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}//CHANGELOG.md --outfile ${{ matrix.package.local_path}}/CHANGELOG.md
+
+      - name: Install conventional-changelog-cli
+        run: npm install -g conventional-changelog-cli
+
+      - name: Change folder to package temp
+        run: cd ./temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}
+
+      - name: Create Changelog - Generate changelog
+        run: conventional-changelog -r 0 -p angular --infile ./temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}/CHANGELOG.md --outfile ${{ matrix.package.local_path}}/CHANGELOG.md
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
@@ -106,12 +109,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: git checkout branch
-        run: git checkout -b release-changelog--main origin/release-changelog--main
-
-      - name: git pull
-        run: git pull
 
       - name: Download artifact
         uses: actions/download-artifact@v3
