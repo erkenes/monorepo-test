@@ -33,6 +33,15 @@ jobs:
             default_branch: 'main'
 
     steps:
+      - name: Create Changelog - Init Node (npm)
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install conventional-changelog-cli
+        run: npm install -g conventional-changelog-cli
+
       - name: Create Changelog - Generate token
         id: generate_token_changelog
         uses: tibdex/github-app-token@586e1a624db6a5a4ac2c53daeeded60c5e3d50fe
@@ -48,26 +57,17 @@ jobs:
           path: './temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}'
           fetch-depth: 0
 
-      - name: Create Changelog - Init Node (npm)
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'npm'
-
-      - name: Install conventional-changelog-cli
-        run: npm install -g conventional-changelog-cli
-
       - name: Change folder to package temp
         run: cd ./temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}
 
       - name: Create Changelog - Generate changelog
         run: conventional-changelog -r 0 -p angular --infile ./temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}/CHANGELOG.md --outfile ${{ matrix.package.local_path}}/CHANGELOG.md
 
-#      - name: Upload artifact
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: changelog-${{ matrix.package.repository_organization }}-${{ matrix.package.repository_name }}
-#          path: ${{ matrix.package.local_path}}/CHANGELOG.md
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: changelog2-${{ matrix.package.repository_organization }}-${{ matrix.package.repository_name }}
+          path: ${{ matrix.package.local_path}}/CHANGELOG.md
 
       - name: Push Changelog - Commit and push
         uses: EndBug/add-and-commit@v7
