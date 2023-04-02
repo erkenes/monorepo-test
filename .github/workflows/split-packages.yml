@@ -66,6 +66,7 @@ jobs:
           path: './temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}'
           ref: ${{ env.RELEASE_VERSION }}
           token: ${{ steps.generate_token.outputs.token }}
+          fetch-depth: 0
 
       - name: Create Changelog - Init Node (npm)
         uses: actions/setup-node@v3
