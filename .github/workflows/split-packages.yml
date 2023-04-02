@@ -83,7 +83,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: changelog
-          path: ${{ matrix.package.local_path}}/CHANGELOG.md
+          path: ${{ matrix.package.local_path}}_CHANGELOG.md
 
   commit-changelog:
     needs: packages_split
@@ -116,10 +116,9 @@ jobs:
 #          token: ${{ steps.generate_token_changelog.outputs.token }}
       -
         name: Commit and push
+        id: auto-commit-action
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          # Optional. Commit message for the created commit.
-          # Defaults to "Apply automatic changes"
           commit_message: 'fix: Add changelogs for packages'
           branch: release-changelog--${{ github.base_ref }}
           create_branch: true
