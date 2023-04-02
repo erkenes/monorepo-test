@@ -12,13 +12,6 @@ env:
   REPOSITORY_PROTOCOL: https://
   REPOSITORY_HOST: github.com
   REPOSITORY_NAME: monorepo-test
-  PACKAGES:
-    - local_path: 'Packages/First.Package'
-      repository: 'erkenes/monorepo-test-target-1'
-      default_branch: 'main'
-    - local_path: 'Packages/Second.Package'
-      repository: 'erkenes/monorepo-test-target-2'
-      default_branch: 'main'
 
 jobs:
   packages_split:
@@ -27,7 +20,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: ${{ env.PACKAGES }}
+        package:
+          - local_path: 'Packages/First.Package'
+            repository: 'erkenes/monorepo-test-target-1'
+            default_branch: 'main'
+          - local_path: 'Packages/Second.Package'
+            repository: 'erkenes/monorepo-test-target-2'
+            default_branch: 'main'
 
     steps:
       -
@@ -92,7 +91,13 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        package: ${{ env.PACKAGES }}
+        package:
+          - local_path: 'Packages/First.Package'
+            repository: 'erkenes/monorepo-test-target-1'
+            default_branch: 'main'
+          - local_path: 'Packages/Second.Package'
+            repository: 'erkenes/monorepo-test-target-2'
+            default_branch: 'main'
 
     steps:
       - name: Checkout repository
