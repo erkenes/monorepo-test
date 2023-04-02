@@ -38,6 +38,8 @@ jobs:
         with:
           app_id: ${{ secrets.TOKEN_APP_ID }}
           private_key: ${{ secrets.TOKEN_APP_PRIVATE_KEY }}
+          permissions: >-
+            {"members": "write"}
       - name: Create Changelog - Checkout repository
         uses: actions/checkout@v3
         with:
