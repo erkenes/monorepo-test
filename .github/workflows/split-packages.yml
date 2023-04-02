@@ -83,6 +83,8 @@ jobs:
     needs: packages_split
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 #      # Create changelog
 #      - name: Create Changelog - Generate token
 #        id: generate_token_changelog
@@ -98,7 +100,7 @@ jobs:
 #          ref: ${{ env.RELEASE_VERSION }}
 #          token: ${{ steps.generate_token_changelog.outputs.token }}
       -
-        name: Create Changelog - Commit and push
+        name: Commit and push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           # Optional. Commit message for the created commit.
@@ -106,6 +108,12 @@ jobs:
           commit_message: 'fix: Add changelog for ${{ matrix.package.repository }}'
           branch: release/${{ env.RELEASE_VERSION }}
           create_branch: true
+      - name: "Run if changes have been detected"
+        if: steps.auto-commit-action.outputs.changes_detected == 'true'
+        run: echo "Changes!"
+      - name: "Run if no changes have been detected"
+        if: steps.auto-commit-action.outputs.changes_detected == 'false'
+        run: echo "No Changes!"
 #      -
 #        name: Push Changelog - Commit and push
 #        uses: EndBug/add-and-commit@v7
