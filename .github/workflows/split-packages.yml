@@ -55,15 +55,15 @@ jobs:
           default_branch: ${{ matrix.package.default_branch }}
           target_branch: ${{ env.RELEASE_VERSION }}
           package_directory: ${{ matrix.package.local_path }}
-          remote_repository: '${{ env.REPOSITORY_PROTOCOL }}${{ env.REPOSITORY_HOST }}/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}/.git'
+          remote_repository: '${{ env.REPOSITORY_PROTOCOL }}${{ env.REPOSITORY_HOST }}/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}.git'
           remote_repository_access_token: 'x-access-token:${{ steps.generate_token.outputs.token }}'
 
       # Create changelog
       - name: Create Changelog - Checkout repository
         uses: actions/checkout@v3
         with:
-          repository: ${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}/
-          path: './temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}/'
+          repository: ${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}
+          path: './temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}'
           ref: ${{ env.RELEASE_VERSION }}
           token: ${{ steps.generate_token.outputs.token }}
       -
@@ -82,7 +82,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: changelog-${{ matrix.package.repository_organization }}-${{ matrix.package.repository_name }}/
+          name: changelog-${{ matrix.package.repository_organization }}-${{ matrix.package.repository_name }}
           path: ${{ matrix.package.local_path}}/CHANGELOG.md
 
   commit-changelog:
@@ -110,7 +110,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-          name: changelog-${{ matrix.package.repository_organization }}-${{ matrix.package.repository_name }}/
+          name: changelog-${{ matrix.package.repository_organization }}-${{ matrix.package.repository_name }}
           path: ${{ matrix.package.local_path}}/CHANGELOG.md
 
 #      # Create changelog
@@ -123,15 +123,15 @@ jobs:
 #      - name: Create Changelog - Checkout repository
 #        uses: actions/checkout@v3
 #        with:
-#          repository: ${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}/
-#          path: './temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}/'
+#          repository: ${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}
+#          path: './temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}'
 #          ref: ${{ env.RELEASE_VERSION }}
 #          token: ${{ steps.generate_token_changelog.outputs.token }}
       - name: Commit and push
         id: auto-commit-action
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: 'fix: Add changelogs for package ${{ matrix.package.repository_name }}/'
+          commit_message: 'fix: Add changelogs for package ${{ matrix.package.repository_name }}'
           branch: release-changelog--main
           create_branch: true
       - name: "Run if changes have been detected"
