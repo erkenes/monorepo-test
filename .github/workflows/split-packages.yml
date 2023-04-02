@@ -127,6 +127,8 @@ jobs:
 #          path: './temp/changelog/${{ matrix.package.repository_organization }}/${{ matrix.package.repository_name }}'
 #          ref: ${{ env.RELEASE_VERSION }}
 #          token: ${{ steps.generate_token_changelog.outputs.token }}
+      - name: Git pull
+        run: git pull
       - name: Commit and push
         id: auto-commit-action
         uses: stefanzweifel/git-auto-commit-action@v4
