@@ -81,7 +81,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: changelog-${{ matrix.package.repository }}
-          path: ${{ matrix.package.local_path}}_CHANGELOG.md
+          path: ${{ matrix.package.local_path}}/CHANGELOG.md
 
   commit-changelog:
     needs: packages_split
@@ -107,6 +107,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: changelog-${{ matrix.package.repository }}
+          path: ${{ matrix.package.local_path}}/CHANGELOG.md
 
 #      # Create changelog
 #      - name: Create Changelog - Generate token
