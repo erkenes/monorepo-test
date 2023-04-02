@@ -82,7 +82,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ${{ matrix.package.local_path}}/CHANGELOG.md
-          key: changelog
+          key: ${{ github.sha }}
 
   commit-changelog:
     needs: packages_split
@@ -94,7 +94,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ./*
-          key: changelog
+          key: ${{ github.sha }}
 
       - name: Display structure of first package
         run: ls -R
