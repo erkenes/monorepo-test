@@ -93,6 +93,7 @@ jobs:
           # Defaults to "Apply automatic changes"
           commit_message: 'fix: Add changelog for ${{ matrix.package.repository }}'
           branch: release/${{ env.RELEASE_VERSION }}
+          create_branch: true
 #      -
 #        name: Push Changelog - Commit and push
 #        uses: EndBug/add-and-commit@v7
