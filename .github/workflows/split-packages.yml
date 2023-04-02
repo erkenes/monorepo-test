@@ -12,6 +12,13 @@ env:
   REPOSITORY_PROTOCOL: https://
   REPOSITORY_HOST: github.com
   REPOSITORY_NAME: monorepo-test
+  PACKAGES:
+    - local_path: 'Packages/First.Package'
+      repository: 'erkenes/monorepo-test-target-1'
+      default_branch: 'main'
+    - local_path: 'Packages/Second.Package'
+      repository: 'erkenes/monorepo-test-target-2'
+      default_branch: 'main'
 
 jobs:
   packages_split:
@@ -20,15 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package:
-          -
-            local_path: 'Packages/First.Package'
-            repository: 'erkenes/monorepo-test-target-1'
-            default_branch: 'main'
-          -
-            local_path: 'Packages/Second.Package'
-            repository: 'erkenes/monorepo-test-target-2'
-            default_branch: 'main'
+        package: ${{ env.PACKAGES }}
 
     steps:
       -
@@ -82,12 +81,19 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: changelog
+          name: changelog-${{ matrix.package.repository }}
           path: ${{ matrix.package.local_path}}_CHANGELOG.md
 
   commit-changelog:
     needs: packages_split
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        package: ${{ env.PACKAGES }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -95,11 +101,8 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-          name: changelog
+          name: changelog-${{ matrix.package.repository }}
 
-      - name: Display structure of first package
-        run: ls -R
-        working-directory: Packages/First.Package
 #      # Create changelog
 #      - name: Create Changelog - Generate token
 #        id: generate_token_changelog
@@ -114,13 +117,12 @@ jobs:
 #          path: './temp/changelog/${{ matrix.package.repository }}'
 #          ref: ${{ env.RELEASE_VERSION }}
 #          token: ${{ steps.generate_token_changelog.outputs.token }}
-      -
-        name: Commit and push
+      - name: Commit and push
         id: auto-commit-action
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: 'fix: Add changelogs for packages'
-          branch: release-changelog--${{ github.base_ref }}
+          commit_message: 'fix: Add changelogs for package ${{ matrix.package.repository }}'
+          branch: release-changelog--main
           create_branch: true
       - name: "Run if changes have been detected"
         if: steps.auto-commit-action.outputs.changes_detected == 'true'
