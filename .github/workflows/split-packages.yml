@@ -79,11 +79,10 @@ jobs:
         name: Create Changelog - Generate changelog
         run: npm run changelog -- --infile ./temp/changelog/${{ matrix.package.repository }}/CHANGELOG.md --outfile ${{ matrix.package.local_path}}/CHANGELOG.md
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      - uses: actions/cache@v2
         with:
-          name: changelog
-          path: ${{ matrix.package.local_path}}_CHANGELOG.md
+          path: ${{ matrix.package.local_path}}/CHANGELOG.md
+          key: changelog
 
   commit-changelog:
     needs: packages_split
@@ -92,10 +91,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Download artifact
-        uses: actions/download-artifact@v3
+      - uses: actions/cache@v2
         with:
-          name: changelog
+          path: ./*
+          key: changelog
 
       - name: Display structure of first package
         run: ls -R
